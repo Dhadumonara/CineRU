@@ -27,33 +27,7 @@
         .off { opacity: 0.2; pointer-events: none; }
 
         /* Admin Panel */
-        #admin { display:none; position:fixed; inset:0; background: #000; z-index: 2000; padding: 20px; overflow-y: auto; }
-        input { width: 90%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
-        textarea { width: 90%; height: 120px; background: #000; color: #0f0; border: 1px solid #333; font-family: monospace; font-size: 10px; margin-top: 10px; }
-    </style>
-</head>
-<body>
-
-    <div class="header">
-        <div class="logo" id="logo">🎬 CineRU</div>
-    </div>
-
-    <div class="container">
-        <div id="movieGrid" class="grid">
-            </div>
-    </div>
-
-    <div id="modal">
-        <div class="modal-box">
-            <h2 id="mTitle" style="color:var(--red); margin:0 0 15px 0;"></h2>
-            <button class="btn" style="background:var(--red)" onclick="step(1)">1. Unlock File</button>
-            <button id="s2" class="btn off" style="background:#b8860b" onclick="step(2)">2. Final Verification</button>
-            <button id="s3" class="btn off" style="background:#28a745" onclick="step(3)">🚀 Open Telegram</button>
-            <p onclick="document.getElementById('modal').style.display='none'" style="margin-top:20px; color:#555; cursor:pointer;">Cancel</p>
-        </div>
-    </div>
-
-    <div id="admin">
+      <div id="admin">
         <h2 style="color:var(--red)">🎬 CineRU Manager</h2>
         <input id="inT" placeholder="Movie Name">
         <input id="inI" placeholder="Poster URL">
@@ -65,12 +39,21 @@
         <button onclick="location.reload()" class="btn" style="background:#222">Exit & Close</button>
     </div>
 
+    <div id="passModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
+        <div style="background:#111; padding:30px; border-radius:15px; border:1px solid #e50914; text-align:center; width:280px; box-shadow: 0 0 20px rgba(229,9,20,0.2);">
+            <div style="font-size:1.5rem; margin-bottom:20px;">🔒 Admin Access</div>
+            <input type="password" id="pInput" placeholder="Enter Password" style="width:100%; padding:12px; margin-bottom:15px; background:#222; border:1px solid #444; color:white; border-radius:8px; text-align:center; box-sizing:border-box;">
+            <button onclick="verifyPass()" class="btn" style="background:#e50914; margin:0;">Login</button>
+            <p onclick="document.getElementById('passModal').style.display='none'" style="color:#555; margin-top:15px; cursor:pointer; font-size:0.8rem;">Cancel</p>
+        </div>
+    </div>
+
     <script>
-        // --- DATA SECTION ---
+        // --- CONFIG ---
         const AD_URL = "https://www.google.com"; // <-- PUT YOUR ADSTERRA LINK HERE
         const PASS = "2024";
 
-        // To add movies, paste the code from Admin here:
+        // To add movies permanently, paste the code from Admin here:
         let movies = [
             {t: "Deadpool & Wolverine", i: "https://image.tmdb.org/t/p/w500/8cdWjvZQUmOZpPzs9vH7C2SClgn.jpg", l: "https://t.me/yourlink"},
             {t: "Inside Out 2", i: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvhtv2oP0.jpg", l: "https://t.me/yourlink"}
@@ -78,6 +61,7 @@
 
         let curL = "";
 
+        // Render Function
         function render() {
             document.getElementById('movieGrid').innerHTML = movies.map((m, i) => `
                 <div class="card" onclick="openGate(${i})">
@@ -87,6 +71,7 @@
             document.getElementById('output').value = `let movies = ${JSON.stringify(movies, null, 4)};`;
         }
 
+        // Ad Logic
         function openGate(i) {
             curL = movies[i].l;
             document.getElementById('mTitle').innerText = movies[i].t;
@@ -102,17 +87,30 @@
             if(s==3) window.location.href = curL;
         }
 
-        // --- ADMIN TRIGGER (HOLD LOGO) ---
+        // --- STYLISH PASSWORD LOGIC ---
         let timer;
         const logoBtn = document.getElementById('logo');
 
-        function startTimer() { timer = setTimeout(() => { if(prompt("Pass:") === PASS) document.getElementById('admin').style.display='block'; }, 1500); }
-        function endTimer() { clearTimeout(timer); }
+        logoBtn.onmousedown = logoBtn.ontouchstart = () => { 
+            timer = setTimeout(() => { 
+                document.getElementById('passModal').style.display = 'flex';
+                document.getElementById('pInput').focus();
+            }, 1500); 
+        };
+        logoBtn.onmouseup = logoBtn.ontouchend = () => clearTimeout(timer);
 
-        logoBtn.addEventListener('touchstart', startTimer);
-        logoBtn.addEventListener('touchend', endTimer);
-        logoBtn.addEventListener('mousedown', startTimer);
-        logoBtn.addEventListener('mouseup', endTimer);
+        function verifyPass() {
+            const val = document.getElementById('pInput').value;
+            if(val === PASS) {
+                document.getElementById('passModal').style.display = 'none';
+                document.getElementById('admin').style.display = 'block';
+                document.getElementById('pInput').value = "";
+                drawAdm();
+            } else {
+                alert("Wrong Password");
+                document.getElementById('pInput').value = "";
+            }
+        }
 
         // --- ADMIN FUNCTIONS ---
         function addM() {
@@ -128,7 +126,7 @@
         function drawAdm() {
             document.getElementById('admList').innerHTML = movies.map((m, i) => `
                 <div style="padding:10px; border-bottom:1px solid #222; display:flex; justify-content:space-between;">
-                    <span>${m.t}</span> <span onclick="delM(${i})" style="color:red;">Del</span>
+                    <span>${m.t}</span> <span onclick="delM(${i})" style="color:red; cursor:pointer;">Del</span>
                 </div>`).join('');
             document.getElementById('output').value = `let movies = ${JSON.stringify(movies, null, 4)};`;
         }
@@ -137,3 +135,4 @@
     </script>
 </body>
 </html>
+
