@@ -3,74 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineRU | Home</title>
+    <title>CineRU | One-Click Telegram</title>
     <style>
-        :root { --red: #e50914; --bg: #0b0b0b; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 10px; text-align: center; }
-        .logo { font-size: 2.2rem; font-weight: bold; color: var(--red); margin: 25px 0; letter-spacing: 2px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
-        .card { background: #141414; border-radius: 10px; overflow: hidden; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--red); transform: scale(1.03); }
-        .card img { width: 100%; height: 220px; object-fit: cover; }
-        .card h3 { font-size: 0.9rem; padding: 10px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        :root { --red: #e50914; --dark: #080808; --card-bg: #121212; }
+        body { background: var(--dark); color: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 10px; text-align: center; }
         
-        /* Modal for Ads/Unlock */
-        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); justify-content:center; align-items:center; z-index:100; }
-        .box { background:#1a1a1a; padding:30px; border-radius:15px; width:85%; max-width:400px; border: 1px solid #333; }
-        .btn { display:block; width:100%; padding:15px; margin:12px 0; border:none; border-radius:8px; color:white; font-weight:bold; font-size: 1rem; cursor: pointer; }
+        /* Layout */
+        .header { display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .logo { font-size: 2.2rem; font-weight: 900; color: var(--red); letter-spacing: 1px; cursor: pointer; }
+        
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; max-width: 1100px; margin: auto; }
+        
+        .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; position: relative; }
+        .movie-card:hover { transform: scale(1.05); border-color: var(--red); }
+        .movie-card img { width: 100%; height: 210px; object-fit: cover; }
+        .movie-card h3 { font-size: 0.85rem; padding: 10px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Unlocker Modal */
+        #unlockView { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { background: #181818; padding: 30px; border-radius: 20px; width: 85%; max-width: 380px; border: 1px solid #333; box-shadow: 0 0 20px rgba(229, 9, 20, 0.3); }
+        .step-btn { display: block; width: 100%; padding: 16px; margin: 12px 0; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; color: white; cursor: pointer; transition: 0.2s; }
+        .btn-1 { background: #ff4d4d; } .btn-2 { background: #ffa500; } .btn-3 { background: #28a745; }
+        .disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+
+        /* Secret Generator Tool */
+        #adminPanel { display: none; background: #111; padding: 20px; border: 1px dashed var(--red); margin: 20px auto; max-width: 400px; border-radius: 10px; }
+        input { width: 90%; padding: 10px; margin: 5px; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
+        textarea { width: 90%; height: 80px; background: #000; color: #0f0; margin-top: 10px; font-family: monospace; }
     </style>
 </head>
 <body>
 
-    <div class="logo">🎬 CineRU</div>
+    <div class="header">
+        <div class="logo" ondblclick="toggleAdmin()">🎬 CineRU</div>
+    </div>
 
-    <div id="movieGrid" class="grid">
-        <div class="card" onclick="openM('Deadpool 3', 'https://t.me/yourlink')">
-            <img src="https://via.placeholder.com/150">
-            <h3>Deadpool 3</h3>
-        </div>
-
-        <div class="card" onclick="openM('Avatar 2', 'https://t.me/yourlink')">
-            <img src="https://via.placeholder.com/150">
-            <h3>Avatar 2</h3>
+    <div id="movieContainer" class="movie-grid">
+        <div class="movie-card" onclick="openUnlocker('Deadpool & Wolverine', 'https://t.me/your_link_here')">
+            <img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUmOZpPzs9vH7C2SClgn.jpg">
+            <h3>Deadpool & Wolverine</h3>
         </div>
 
         </div>
 
-    <div id="modal">
-        <div class="box">
-            <h2 id="mTitle" style="color:var(--red); margin-top:0;"></h2>
-            <button class="btn" style="background:#d9534f" onclick="adStep(1)">1. Unlock File</button>
-            <button id="step2" class="btn" style="background:#f0ad4e;opacity:0.3" disabled onclick="adStep(2)">2. Verify Link</button>
-            <button id="step3" class="btn" style="background:#5cb85c;opacity:0.3" disabled onclick="adStep(3)">🚀 Get Telegram Link</button>
-            <p onclick="document.getElementById('modal').style.display='none'" style="color:gray; cursor:pointer; margin-top:15px;">← Cancel</p>
+    <div id="unlockView">
+        <div class="modal-box">
+            <h2 id="targetTitle" style="color:var(--red); margin:0 0 10px 0;"></h2>
+            <p style="font-size: 0.9rem; color: #bbb;">Complete steps to unlock Telegram file</p>
+            
+            <button class="btn-1 step-btn" onclick="triggerAd(1)">STEP 1: Unlock</button>
+            <button id="s2" class="btn-2 step-btn disabled" onclick="triggerAd(2)">STEP 2: Verify</button>
+            <button id="s3" class="btn-3 step-btn disabled" onclick="triggerAd(3)">🚀 GET TELEGRAM FILE</button>
+            
+            <p onclick="closeUnlocker()" style="margin-top:20px; color: #666; cursor: pointer; text-decoration: underline;">Cancel</p>
         </div>
     </div>
 
+    <div id="adminPanel">
+        <h3>Add Movie Generator</h3>
+        <input id="inT" placeholder="Movie Name">
+        <input id="inI" placeholder="Poster Image URL">
+        <input id="inL" placeholder="Telegram Link">
+        <button onclick="createMovieCode()" style="padding:10px; width:95%; background:blue; color:white; border:none; margin-top:10px;">Generate Code</button>
+        <textarea id="outCode" readonly placeholder="Your code will appear here..."></textarea>
+    </div>
+
     <script>
-        let currentLink = "";
-        function openM(title, link) {
-            currentLink = link;
-            document.getElementById('mTitle').innerText = title;
-            document.getElementById('modal').style.display = 'flex';
-            resetSteps();
+        let telegramURL = "";
+        const ADSTERRA_LINK = "https://www.google.com"; // <-- REPLACE WITH YOUR ADSTERRA DIRECT LINK
+
+        function openUnlocker(title, link) {
+            telegramURL = link;
+            document.getElementById('targetTitle').innerText = title;
+            document.getElementById('unlockView').style.display = 'flex';
+            // Reset buttons
+            document.getElementById('s2').classList.add('disabled');
+            document.getElementById('s3').classList.add('disabled');
         }
 
-        function adStep(s) {
-            window.open('https://google.com'); // Put your Adsterra Direct Link here
-            if(s==1) { btnActive('step2'); }
-            if(s==2) { btnActive('step3'); }
-            if(s==3) { window.location.href = currentLink; }
+        function triggerAd(step) {
+            window.open(ADSTERRA_LINK, '_blank');
+            
+            if(step === 1) {
+                document.getElementById('s2').classList.remove('disabled');
+            } else if(step === 2) {
+                document.getElementById('s3').classList.remove('disabled');
+            } else if(step === 3) {
+                window.location.href = telegramURL;
+            }
         }
 
-        function btnActive(id) {
-            let b = document.getElementById(id);
-            b.disabled = false; b.style.opacity = 1;
+        function closeUnlocker() { document.getElementById('unlockView').style.display = 'none'; }
+        
+        // Admin Helper Functions
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
         }
 
-        function resetSteps() {
-            document.getElementById('step2').disabled = true; document.getElementById('step2').style.opacity = 0.3;
-            document.getElementById('step3').disabled = true; document.getElementById('step3').style.opacity = 0.3;
+        function createMovieCode() {
+            const t = document.getElementById('inT').value;
+            const i = document.getElementById('inI').value;
+            const l = document.getElementById('inL').value;
+            const code = `<div class="movie-card" onclick="openUnlocker('${t.replace(/'/g, "\\'")}','${l}')">\n    <img src="${i}">\n    <h3>${t}</h3>\n</div>`;
+            document.getElementById('outCode').value = code;
         }
     </script>
 </body>
