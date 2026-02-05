@@ -5,55 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🎬 CineRU</title>
     <style>
-        :root { --red: #E50914; --bg: #050505; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; user-select: none; }
+        :root { --red: #E50914; --bg: #050505; --card: #121212; }
+        body { background: var(--bg); color: white; font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         /* Premium Header */
-        .header { padding: 25px 0; text-align: center; background: linear-gradient(to bottom, #000, transparent); sticky; top: 0; z-index: 100; }
-        .logo { font-size: 2.2rem; font-weight: 900; color: var(--red); cursor: pointer; text-shadow: 0 0 15px rgba(229, 9, 20, 0.4); }
+        .header { padding: 30px 0; text-align: center; background: linear-gradient(to bottom, #000, transparent); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 2.2rem; font-weight: 900; color: var(--red); cursor: pointer; text-shadow: 0 0 20px rgba(229, 9, 20, 0.5); }
 
-        /* Movie Grid - The layout you liked */
+        /* Netflix-Style Grid */
         .container { padding: 10px 15px 100px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
-        .card { background: #111; border-radius: 8px; overflow: hidden; border: 1px solid #222; transition: 0.3s; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        @media (min-width: 768px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+
+        .card { background: var(--card); border-radius: 6px; overflow: hidden; border: 1px solid #222; transition: 0.3s ease; }
         .card:active { transform: scale(0.95); }
         .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        .card-info { padding: 8px; font-size: 0.75rem; text-align: center; background: #181818; }
+        .card-info { padding: 8px; font-size: 0.7rem; text-align: center; background: #181818; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Adsterra Unlocker Modal */
-        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .modal-box { background: #181818; width: 85%; max-width: 340px; padding: 25px; border-radius: 15px; border: 1px solid #333; text-align: center; }
-        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; }
-        .off { opacity: 0.2; pointer-events: none; }
+        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .modal-box { background: #111; width: 85%; max-width: 320px; padding: 25px; border-radius: 15px; border: 1px solid #333; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,1); }
+        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .off { opacity: 0.15; pointer-events: none; background: #333 !important; }
 
-        /* Admin Panel */
-      <div id="admin">
-        <h2 style="color:var(--red)">🎬 CineRU Manager</h2>
-        <input id="inT" placeholder="Movie Name">
-        <input id="inI" placeholder="Poster URL">
-        <input id="inL" placeholder="Telegram Link">
-        <button onclick="addM()" class="btn" style="background:blue">Add Movie</button>
-        <div id="admList" style="margin-top:20px;"></div>
-        <p style="color:yellow; font-size:0.8rem; margin-top:20px;">Copy this code and paste into GitHub index.html:</p>
-        <textarea id="output" readonly onclick="this.select()"></textarea>
-        <button onclick="location.reload()" class="btn" style="background:#222">Exit & Close</button>
+        /* Admin & Pass Panels */
+        #admin, #passModal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.98); z-index: 2000; padding: 20px; overflow-y: auto; align-items: center; justify-content: center; }
+        .admin-box { background: #111; padding: 20px; border-radius: 12px; border: 1px solid var(--red); width: 90%; max-width: 400px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #181818; border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; }
+        textarea { width: 100%; height: 100px; background: #000; color: #0f0; border: 1px solid #333; font-family: monospace; font-size: 10px; margin-top: 10px; border-radius: 6px; padding: 10px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo" id="logo">🎬 CineRU</div>
     </div>
 
-    <div id="passModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
-        <div style="background:#111; padding:30px; border-radius:15px; border:1px solid #e50914; text-align:center; width:280px; box-shadow: 0 0 20px rgba(229,9,20,0.2);">
-            <div style="font-size:1.5rem; margin-bottom:20px;">🔒 Admin Access</div>
-            <input type="password" id="pInput" placeholder="Enter Password" style="width:100%; padding:12px; margin-bottom:15px; background:#222; border:1px solid #444; color:white; border-radius:8px; text-align:center; box-sizing:border-box;">
-            <button onclick="verifyPass()" class="btn" style="background:#e50914; margin:0;">Login</button>
-            <p onclick="document.getElementById('passModal').style.display='none'" style="color:#555; margin-top:15px; cursor:pointer; font-size:0.8rem;">Cancel</p>
+    <div class="container">
+        <div id="movieGrid" class="grid"></div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-box">
+            <h2 id="mTitle" style="color:var(--red); margin:0 0 15px 0; font-size: 1.4rem;"></h2>
+            <button class="btn" style="background:var(--red)" onclick="step(1)">1. Unlock Link</button>
+            <button id="s2" class="btn off" style="background:#b8860b" onclick="step(2)">2. Verify Link</button>
+            <button id="s3" class="btn off" style="background:#28a745" onclick="step(3)">🚀 Open Telegram</button>
+            <p onclick="document.getElementById('modal').style.display='none'" style="margin-top:15px; color:#555; cursor:pointer;">Cancel</p>
+        </div>
+    </div>
+
+    <div id="passModal">
+        <div class="admin-box" style="text-align: center;">
+            <div style="font-size:1.5rem; margin-bottom:20px; font-weight: bold;">🔒 Admin Login</div>
+            <input type="password" id="pInput" placeholder="Password" style="text-align: center;">
+            <button onclick="verifyPass()" class="btn" style="background:var(--red)">Login</button>
+            <p onclick="document.getElementById('passModal').style.display='none'" style="color:#555; cursor:pointer; margin-top:10px;">Cancel</p>
+        </div>
+    </div>
+
+    <div id="admin">
+        <div class="admin-box">
+            <h2 style="color:var(--red); margin:0 0 15px;">Admin Panel</h2>
+            <input id="inT" placeholder="Movie Name">
+            <input id="inI" placeholder="Poster URL">
+            <input id="inL" placeholder="Telegram Link">
+            <button onclick="addM()" class="btn" style="background:var(--red)">Add Movie</button>
+            <div id="admList" style="margin-top:15px; max-height: 150px; overflow-y: auto;"></div>
+            <p style="color:yellow; font-size:0.7rem; margin-top:15px;">Copy & Replace 'let movies = [...]' in GitHub:</p>
+            <textarea id="output" readonly onclick="this.select()"></textarea>
+            <button onclick="location.reload()" class="btn" style="background:#333">Exit</button>
         </div>
     </div>
 
     <script>
-        // --- CONFIG ---
-        const AD_URL = "https://www.google.com"; // <-- PUT YOUR ADSTERRA LINK HERE
+        const AD_URL = "https://www.google.com"; // <-- REPLACE WITH ADSTERRA
         const PASS = "2024";
 
-        // To add movies permanently, paste the code from Admin here:
         let movies = [
             {t: "Deadpool & Wolverine", i: "https://image.tmdb.org/t/p/w500/8cdWjvZQUmOZpPzs9vH7C2SClgn.jpg", l: "https://t.me/yourlink"},
             {t: "Inside Out 2", i: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvhtv2oP0.jpg", l: "https://t.me/yourlink"}
@@ -61,7 +89,6 @@
 
         let curL = "";
 
-        // Render Function
         function render() {
             document.getElementById('movieGrid').innerHTML = movies.map((m, i) => `
                 <div class="card" onclick="openGate(${i})">
@@ -71,7 +98,6 @@
             document.getElementById('output').value = `let movies = ${JSON.stringify(movies, null, 4)};`;
         }
 
-        // Ad Logic
         function openGate(i) {
             curL = movies[i].l;
             document.getElementById('mTitle').innerText = movies[i].t;
@@ -87,32 +113,19 @@
             if(s==3) window.location.href = curL;
         }
 
-        // --- STYLISH PASSWORD LOGIC ---
         let timer;
         const logoBtn = document.getElementById('logo');
-
-        logoBtn.onmousedown = logoBtn.ontouchstart = () => { 
-            timer = setTimeout(() => { 
-                document.getElementById('passModal').style.display = 'flex';
-                document.getElementById('pInput').focus();
-            }, 1500); 
-        };
+        logoBtn.onmousedown = logoBtn.ontouchstart = () => timer = setTimeout(() => { document.getElementById('passModal').style.display='flex'; }, 1500);
         logoBtn.onmouseup = logoBtn.ontouchend = () => clearTimeout(timer);
 
         function verifyPass() {
-            const val = document.getElementById('pInput').value;
-            if(val === PASS) {
+            if(document.getElementById('pInput').value === PASS) {
                 document.getElementById('passModal').style.display = 'none';
-                document.getElementById('admin').style.display = 'block';
-                document.getElementById('pInput').value = "";
+                document.getElementById('admin').style.display = 'flex';
                 drawAdm();
-            } else {
-                alert("Wrong Password");
-                document.getElementById('pInput').value = "";
-            }
+            } else { alert("Wrong Password"); }
         }
 
-        // --- ADMIN FUNCTIONS ---
         function addM() {
             let t = document.getElementById('inT').value, i = document.getElementById('inI').value, l = document.getElementById('inL').value;
             if(t && i && l) {
@@ -125,8 +138,8 @@
 
         function drawAdm() {
             document.getElementById('admList').innerHTML = movies.map((m, i) => `
-                <div style="padding:10px; border-bottom:1px solid #222; display:flex; justify-content:space-between;">
-                    <span>${m.t}</span> <span onclick="delM(${i})" style="color:red; cursor:pointer;">Del</span>
+                <div style="padding:8px; border-bottom:1px solid #222; display:flex; justify-content:space-between; font-size:0.8rem;">
+                    <span>${m.t}</span> <span onclick="delM(${i})" style="color:var(--red); cursor:pointer;">Del</span>
                 </div>`).join('');
             document.getElementById('output').value = `let movies = ${JSON.stringify(movies, null, 4)};`;
         }
@@ -135,4 +148,3 @@
     </script>
 </body>
 </html>
-
