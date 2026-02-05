@@ -7,107 +7,71 @@
     <style>
         :root { --red: #e50914; --bg: #0b0b0b; }
         body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 10px; text-align: center; }
-        .logo { font-size: 2rem; font-weight: bold; color: var(--red); margin: 20px; cursor: pointer; user-select: none; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-        .card { background: #141414; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .card h3 { font-size: 0.8rem; padding: 5px; margin: 0; }
+        .logo { font-size: 2.2rem; font-weight: bold; color: var(--red); margin: 25px 0; letter-spacing: 2px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
+        .card { background: #141414; border-radius: 10px; overflow: hidden; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--red); transform: scale(1.03); }
+        .card img { width: 100%; height: 220px; object-fit: cover; }
+        .card h3 { font-size: 0.9rem; padding: 10px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         /* Modal for Ads/Unlock */
-        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; z-index:100; }
-        .box { background:#1a1a1a; padding:20px; border-radius:10px; width:80%; }
-        .btn { display:block; width:100%; padding:15px; margin:10px 0; border:none; border-radius:5px; color:white; font-weight:bold; }
-
-        /* Secret Admin Panel */
-        #admin { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:200; padding:20px; box-sizing:border-box; }
-        input { width:90%; padding:10px; margin:10px 0; background:#222; border:1px solid #444; color:white; }
+        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); justify-content:center; align-items:center; z-index:100; }
+        .box { background:#1a1a1a; padding:30px; border-radius:15px; width:85%; max-width:400px; border: 1px solid #333; }
+        .btn { display:block; width:100%; padding:15px; margin:12px 0; border:none; border-radius:8px; color:white; font-weight:bold; font-size: 1rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="logo" ondblclick="showAdmin()">🎬 CineRU</div>
-    <div id="movieGrid" class="grid"></div>
+    <div class="logo">🎬 CineRU</div>
+
+    <div id="movieGrid" class="grid">
+        <div class="card" onclick="openM('Deadpool 3', 'https://t.me/yourlink')">
+            <img src="https://via.placeholder.com/150">
+            <h3>Deadpool 3</h3>
+        </div>
+
+        <div class="card" onclick="openM('Avatar 2', 'https://t.me/yourlink')">
+            <img src="https://via.placeholder.com/150">
+            <h3>Avatar 2</h3>
+        </div>
+
+        </div>
 
     <div id="modal">
         <div class="box">
-            <h2 id="mTitle"></h2>
-            <button class="btn" style="background:red" onclick="adStep(1)">1. Unlock Link</button>
-            <button id="step2" class="btn" style="background:orange;opacity:0.5" disabled onclick="adStep(2)">2. Verify</button>
-            <button id="step3" class="btn" style="background:green;opacity:0.5" disabled onclick="adStep(3)">🚀 Get Movie</button>
-            <p onclick="document.getElementById('modal').style.display='none'">Close</p>
+            <h2 id="mTitle" style="color:var(--red); margin-top:0;"></h2>
+            <button class="btn" style="background:#d9534f" onclick="adStep(1)">1. Unlock File</button>
+            <button id="step2" class="btn" style="background:#f0ad4e;opacity:0.3" disabled onclick="adStep(2)">2. Verify Link</button>
+            <button id="step3" class="btn" style="background:#5cb85c;opacity:0.3" disabled onclick="adStep(3)">🚀 Get Telegram Link</button>
+            <p onclick="document.getElementById('modal').style.display='none'" style="color:gray; cursor:pointer; margin-top:15px;">← Cancel</p>
         </div>
     </div>
 
-    <div id="admin">
-        <h2>Admin Panel</h2>
-        <input id="inTitle" placeholder="Movie Name">
-        <input id="inImg" placeholder="Image URL">
-        <input id="inLink" placeholder="Telegram Link">
-        <button class="btn" style="background:red" onclick="addMovie()">Save Movie</button>
-        <button class="btn" style="background:gray" onclick="hideAdmin()">Exit Admin</button>
-        <div id="adminList"></div>
-    </div>
-
     <script>
-        let movies = JSON.parse(localStorage.getItem('myMovies')) || [];
         let currentLink = "";
-
-        function render() {
-            const grid = document.getElementById('movieGrid');
-            grid.innerHTML = movies.map((m, i) => `
-                <div class="card" onclick="openMovie('${m.title}', '${m.link}')">
-                    <img src="${m.thumb}">
-                    <h3>${m.title}</h3>
-                </div>
-            `).join('');
-        }
-
-        function openMovie(t, l) {
-            currentLink = l;
-            document.getElementById('mTitle').innerText = t;
+        function openM(title, link) {
+            currentLink = link;
+            document.getElementById('mTitle').innerText = title;
             document.getElementById('modal').style.display = 'flex';
+            resetSteps();
         }
 
         function adStep(s) {
-            window.open('https://google.com'); // Put your Adsterra link here
-            if(s==1) { document.getElementById('step2').disabled=false; document.getElementById('step2').style.opacity=1; }
-            if(s==2) { document.getElementById('step3').disabled=false; document.getElementById('step3').style.opacity=1; }
+            window.open('https://google.com'); // Put your Adsterra Direct Link here
+            if(s==1) { btnActive('step2'); }
+            if(s==2) { btnActive('step3'); }
             if(s==3) { window.location.href = currentLink; }
         }
 
-        // Admin Logic
-        function showAdmin() { document.getElementById('admin').style.display = 'block'; renderAdminList(); }
-        function hideAdmin() { document.getElementById('admin').style.display = 'none'; }
-        
-        function addMovie() {
-            const t = document.getElementById('inTitle').value;
-            const i = document.getElementById('inImg').value;
-            const l = document.getElementById('inLink').value;
-            if(t && i && l) {
-                movies.push({title: t, thumb: i, link: l});
-                localStorage.setItem('myMovies', JSON.stringify(movies));
-                render();
-                renderAdminList();
-                alert("Saved!");
-            }
+        function btnActive(id) {
+            let b = document.getElementById(id);
+            b.disabled = false; b.style.opacity = 1;
         }
 
-        function deleteMovie(i) {
-            movies.splice(i, 1);
-            localStorage.setItem('myMovies', JSON.stringify(movies));
-            render();
-            renderAdminList();
+        function resetSteps() {
+            document.getElementById('step2').disabled = true; document.getElementById('step2').style.opacity = 0.3;
+            document.getElementById('step3').disabled = true; document.getElementById('step3').style.opacity = 0.3;
         }
-
-        function renderAdminList() {
-            document.getElementById('adminList').innerHTML = movies.map((m, i) => `
-                <div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #333;">
-                    <span>${m.title}</span> <button onclick="deleteMovie(${i})">X</button>
-                </div>
-            `).join('');
-        }
-
-        render();
     </script>
 </body>
 </html>
