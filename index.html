@@ -9,38 +9,46 @@
         body { background: var(--bg); color: white; font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         /* Premium Header */
-        .header { padding: 30px 0; text-align: center; background: linear-gradient(to bottom, #000, transparent); position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 2.2rem; font-weight: 900; color: var(--red); cursor: pointer; text-shadow: 0 0 20px rgba(229, 9, 20, 0.5); }
+        .header { padding: 25px 0 15px; text-align: center; background: linear-gradient(to bottom, #000, transparent); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .logo { font-size: 2.2rem; font-weight: 900; color: var(--red); cursor: pointer; text-shadow: 0 0 20px rgba(229, 9, 20, 0.5); margin-bottom: 15px; }
 
-        /* Netflix-Style Grid */
+        /* Stylish Pill Search Bar */
+        .search-container { padding: 0 20px; margin-bottom: 10px; }
+        .search-box { position: relative; max-width: 500px; margin: 0 auto; }
+        .search-box input { width: 100%; padding: 12px 20px; padding-left: 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50px; font-size: 0.9rem; outline: none; transition: 0.3s; box-sizing: border-box; }
+        .search-box span { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
+
+        /* Movie Grid */
         .container { padding: 10px 15px 100px; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         @media (min-width: 768px) { .grid { grid-template-columns: repeat(6, 1fr); } }
 
-        .card { background: var(--card); border-radius: 6px; overflow: hidden; border: 1px solid #222; transition: 0.3s ease; }
+        .card { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #222; transition: 0.3s ease; }
         .card:active { transform: scale(0.95); }
         .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
         .card-info { padding: 8px; font-size: 0.7rem; text-align: center; background: #181818; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Adsterra Unlocker Modal */
-        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        /* Modals (Ad, Pass, Admin) */
+        #modal, #passModal, #admin { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.96); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .modal-box { background: #111; width: 85%; max-width: 320px; padding: 25px; border-radius: 15px; border: 1px solid #333; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,1); }
-        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; }
         .off { opacity: 0.15; pointer-events: none; background: #333 !important; }
 
-        /* Admin & Pass Panels */
-        #admin, #passModal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.98); z-index: 2000; padding: 20px; overflow-y: auto; align-items: center; justify-content: center; }
+        /* Admin Specifics */
         .admin-box { background: #111; padding: 20px; border-radius: 12px; border: 1px solid var(--red); width: 90%; max-width: 400px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #181818; border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; }
-        textarea { width: 100%; height: 100px; background: #000; color: #0f0; border: 1px solid #333; font-family: monospace; font-size: 10px; margin-top: 10px; border-radius: 6px; padding: 10px; box-sizing: border-box; }
+        .adm-input { width: 100%; padding: 12px; margin: 10px 0; background: #181818; border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; }
+        textarea { width: 100%; height: 100px; background: #000; color: #0f0; border: 1px solid #333; font-family: monospace; font-size: 10px; margin-top: 10px; padding: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="logo" id="logo">🎬 CineRU</div>
-        <div style="padding: 10px 15px;">
-            <input type="text" id="searchBar" onkeyup="filterMovies()" placeholder="🔍 Search movies..." style="max-width: 400px; margin: 0 auto; display: block; background: #111; border: 1px solid #333; padding: 10px 15px; width: 90%;">
+        <div class="search-container">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="searchBar" onkeyup="filterMovies()" placeholder="Search movies...">
+            </div>
         </div>
     </div>
 
@@ -59,9 +67,9 @@
     </div>
 
     <div id="passModal">
-        <div class="admin-box" style="text-align: center;">
+        <div class="modal-box" style="border-color: var(--red);">
             <div style="font-size:1.5rem; margin-bottom:20px; font-weight: bold;">🔒 Admin Login</div>
-            <input type="password" id="pInput" placeholder="Password" style="text-align: center;">
+            <input type="password" id="pInput" class="adm-input" placeholder="Password" style="text-align: center;">
             <button onclick="verifyPass()" class="btn" style="background:var(--red)">Login</button>
             <p onclick="document.getElementById('passModal').style.display='none'" style="color:#555; cursor:pointer; margin-top:10px;">Cancel</p>
         </div>
@@ -70,21 +78,22 @@
     <div id="admin">
         <div class="admin-box">
             <h2 style="color:var(--red); margin:0 0 15px;">Admin Panel</h2>
-            <input id="inT" placeholder="Movie Name">
-            <input id="inI" placeholder="Poster URL">
-            <input id="inL" placeholder="Telegram Link">
+            <input id="inT" class="adm-input" placeholder="Movie Name">
+            <input id="inI" class="adm-input" placeholder="Poster URL">
+            <input id="inL" class="adm-input" placeholder="Telegram Link">
             <button onclick="addM()" class="btn" style="background:var(--red)">Add Movie</button>
-            <div id="admList" style="margin-top:15px; max-height: 150px; overflow-y: auto;"></div>
-            <p style="color:yellow; font-size:0.7rem; margin-top:15px;">Copy & Replace 'let movies = [...]' in GitHub:</p>
+            <div id="admList" style="margin-top:15px; max-height: 150px; overflow-y: auto; border-top: 1px solid #222;"></div>
+            <p style="color:yellow; font-size:0.7rem; margin-top:15px;">Copy this code to GitHub index.html:</p>
             <textarea id="output" readonly onclick="this.select()"></textarea>
-            <button onclick="location.reload()" class="btn" style="background:#333">Exit</button>
+            <button onclick="location.reload()" class="btn" style="background:#333">Exit Admin</button>
         </div>
     </div>
 
     <script>
-        const AD_URL = "https://www.google.com"; 
+        const AD_URL = "https://www.google.com"; // <-- PUT ADSTERRA LINK HERE
         const PASS = "2024";
 
+        // TO SAVE PERMANENTLY: Paste generated code below
         let movies = [
             {t: "Deadpool & Wolverine", i: "https://image.tmdb.org/t/p/w500/8cdWjvZQUmOZpPzs9vH7C2SClgn.jpg", l: "https://t.me/yourlink"},
             {t: "Inside Out 2", i: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvhtv2oP0.jpg", l: "https://t.me/yourlink"}
@@ -92,10 +101,11 @@
 
         let curL = "";
 
-        // NEW: Filter Function
+        // Main Search Filter
         function filterMovies() {
             let input = document.getElementById('searchBar').value.toLowerCase();
             let cards = document.getElementsByClassName('card');
+            const sBar = document.getElementById('searchBar');
             
             movies.forEach((m, i) => {
                 if (m.t.toLowerCase().includes(input)) {
@@ -104,6 +114,14 @@
                     cards[i].style.display = "none";
                 }
             });
+
+            if(input.length > 0) {
+                sBar.style.borderColor = "var(--red)";
+                sBar.style.boxShadow = "0 0 10px rgba(229, 9, 20, 0.2)";
+            } else {
+                sBar.style.borderColor = "rgba(255,255,255,0.1)";
+                sBar.style.boxShadow = "none";
+            }
         }
 
         function render() {
@@ -130,6 +148,7 @@
             if(s==3) window.location.href = curL;
         }
 
+        // Admin Trigger
         let timer;
         const logoBtn = document.getElementById('logo');
         logoBtn.onmousedown = logoBtn.ontouchstart = () => timer = setTimeout(() => { document.getElementById('passModal').style.display='flex'; }, 1500);
@@ -152,7 +171,7 @@
         }
 
         function delM(i) {
-            if(confirm("Delete this?")) {
+            if(confirm("Delete this movie?")) {
                 movies.splice(i, 1); render(); drawAdm();
             }
         }
