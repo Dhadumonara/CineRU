@@ -39,6 +39,9 @@
 
     <div class="header">
         <div class="logo" id="logo">🎬 CineRU</div>
+        <div style="padding: 10px 15px;">
+            <input type="text" id="searchBar" onkeyup="filterMovies()" placeholder="🔍 Search movies..." style="max-width: 400px; margin: 0 auto; display: block; background: #111; border: 1px solid #333; padding: 10px 15px; width: 90%;">
+        </div>
     </div>
 
     <div class="container">
@@ -79,7 +82,7 @@
     </div>
 
     <script>
-        const AD_URL = "https://www.google.com"; // <-- REPLACE WITH ADSTERRA
+        const AD_URL = "https://www.google.com"; 
         const PASS = "2024";
 
         let movies = [
@@ -88,6 +91,20 @@
         ];
 
         let curL = "";
+
+        // NEW: Filter Function
+        function filterMovies() {
+            let input = document.getElementById('searchBar').value.toLowerCase();
+            let cards = document.getElementsByClassName('card');
+            
+            movies.forEach((m, i) => {
+                if (m.t.toLowerCase().includes(input)) {
+                    cards[i].style.display = "";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            });
+        }
 
         function render() {
             document.getElementById('movieGrid').innerHTML = movies.map((m, i) => `
@@ -134,7 +151,11 @@
             }
         }
 
-        function delM(i) { movies.splice(i, 1); render(); drawAdm(); }
+        function delM(i) {
+            if(confirm("Delete this?")) {
+                movies.splice(i, 1); render(); drawAdm();
+            }
+        }
 
         function drawAdm() {
             document.getElementById('admList').innerHTML = movies.map((m, i) => `
