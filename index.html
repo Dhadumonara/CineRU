@@ -3,116 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineRU | Premium Streaming</title>
+    <title>CineRU | Premium</title>
     <style>
-        :root { --accent: #e50914; --main-bg: #050505; --card-bg: #111; }
-        body { background: var(--main-bg); color: white; font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        :root { --accent: #e50914; --bg: #050505; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; user-select: none; }
         
-        /* Premium Header */
-        .nav { background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); padding: 20px; display: flex; justify-content: center; position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 2.4rem; font-weight: 900; color: var(--accent); letter-spacing: -1px; cursor: pointer; text-shadow: 0 0 15px rgba(229, 9, 20, 0.4); }
+        /* Header */
+        .nav { padding: 20px; display: flex; justify-content: center; background: linear-gradient(to bottom, #000, transparent); sticky; top: 0; z-index: 100; }
+        .logo { font-size: 2.2rem; font-weight: 900; color: var(--accent); cursor: pointer; text-shadow: 0 0 10px rgba(229, 9, 20, 0.5); }
 
-        /* Netflix-Style Grid */
-        .container { padding: 0 15px 50px; }
-        .grid-title { text-align: left; font-size: 1.2rem; margin: 20px 0 15px; font-weight: 600; color: #eee; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
-        
-        @media (min-width: 600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
+        /* Movie Grid */
+        .container { padding: 10px 15px 100px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
+        .card { background: #111; border-radius: 8px; overflow: hidden; transition: 0.3s; border: 1px solid #222; }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+        .card-info { padding: 8px; font-size: 0.75rem; text-align: center; }
 
-        .movie-card { background: var(--card-bg); border-radius: 6px; overflow: hidden; position: relative; transition: transform 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .movie-card:active { transform: scale(0.95); }
-        .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        .movie-card .info { padding: 8px; background: #181818; }
-        .movie-card h3 { font-size: 0.75rem; margin: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Clean Unlock Modal */
-        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #181818; width: 90%; max-width: 360px; padding: 30px; border-radius: 12px; border: 1px solid #333; text-align: center; }
-        .step-btn { width: 100%; padding: 16px; margin: 10px 0; border: none; border-radius: 6px; font-weight: 700; color: white; cursor: pointer; font-size: 1rem; }
-        .b-red { background: var(--accent); } .b-gold { background: #b8860b; } .b-green { background: #2b8a3e; }
+        /* Ad Modal */
+        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .modal-box { background: #181818; width: 85%; max-width: 350px; padding: 25px; border-radius: 15px; border: 1px solid #333; text-align: center; }
+        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; }
         .off { opacity: 0.2; pointer-events: none; }
 
-        /* Secret Admin Panel */
-        #admin { display:none; position:fixed; bottom: 0; left: 0; right: 0; background: #111; padding: 20px; border-top: 2px solid var(--accent); z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
-        input { width: 95%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: white; border-radius: 4px; }
-        textarea { width: 95%; height: 60px; background: #000; color: #0f0; margin-top: 10px; font-size: 10px; }
+        /* Admin Style */
+        #admin { display:none; position:fixed; inset:0; background: #000; z-index: 2000; padding: 20px; overflow-y: auto; }
+        input { width: 90%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
+        textarea { width: 90%; height: 100px; background: #111; color: #0f0; font-family: monospace; font-size: 10px; margin-top: 10px; border-radius: 5px; }
+        .admin-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #222; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-    <div class="nav">
-        <div class="logo" id="mainLogo">CineRU</div>
-    </div>
+    <div class="nav"><div class="logo" id="logo">CineRU</div></div>
 
     <div class="container">
-        <h2 class="grid-title">New Releases</h2>
         <div id="movieGrid" class="grid">
-            <div class="movie-card" onclick="openGate('Deadpool & Wolverine', 'https://t.me/yourlink')">
-                <img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUmOZpPzs9vH7C2SClgn.jpg">
-                <div class="info"><h3>Deadpool & Wolverine</h3></div>
-            </div>
-
             </div>
     </div>
 
     <div id="modal">
-        <div class="modal-content">
-            <h2 id="mTitle" style="margin:0 0 10px; font-size:1.4rem;"></h2>
-            <p style="color:#aaa; font-size:0.9rem; margin-bottom:20px;">Complete 2 ads to get the Telegram file.</p>
-            <button class="step-btn b-red" onclick="goAd(1)">STEP 1: Unlock Link</button>
-            <button id="s2" class="step-btn b-gold off" onclick="goAd(2)">STEP 2: Final Verification</button>
-            <button id="s3" class="step-btn b-green off" onclick="goAd(3)">🚀 OPEN TELEGRAM FILE</button>
-            <p onclick="closeGate()" style="margin-top:20px; color:#555; cursor:pointer;">Cancel</p>
+        <div class="modal-box">
+            <h2 id="mTitle" style="color:var(--accent); margin-top:0;"></h2>
+            <button class="btn" style="background:var(--accent)" onclick="step(1)">1. Unlock File</button>
+            <button id="s2" class="btn off" style="background:#b8860b" onclick="step(2)">2. Verify Link</button>
+            <button id="s3" class="btn off" style="background:#2b8a3e" onclick="step(3)">🚀 Get Telegram Link</button>
+            <p onclick="document.getElementById('modal').style.display='none'" style="cursor:pointer; color:#555;">Cancel</p>
         </div>
     </div>
 
     <div id="admin">
-        <h4 style="margin:0 0 10px;">Movie Code Generator</h4>
-        <input id="inT" placeholder="Movie Name">
-        <input id="inI" placeholder="Poster Link (URL)">
+        <h2>Admin Control</h2>
+        <input id="inT" placeholder="Movie Title">
+        <input id="inI" placeholder="Poster URL">
         <input id="inL" placeholder="Telegram Link">
-        <button onclick="gen()" style="width:100%; padding:10px; background:blue; color:white; border:none; border-radius:4px;">Generate</button>
-        <textarea id="res" readonly placeholder="Copy code from here..."></textarea>
-        <button onclick="document.getElementById('admin').style.display='none'" style="margin-top:10px; background:transparent; color:red; border:none; width:100%;">Close Admin</button>
+        <button onclick="addNew()" class="btn" style="background:blue">Add to List</button>
+        <hr style="border:0.5px solid #333;">
+        <div id="adminList"></div>
+        <p style="color:yellow; font-size:0.8rem;">After changes, copy this code and paste it into GitHub:</p>
+        <textarea id="finalCode" readonly onclick="this.select()"></textarea>
+        <button onclick="location.reload()" class="btn" style="background:#333">Close & Exit</button>
     </div>
 
     <script>
-        let finalLink = "";
-        const MY_AD_LINK = "https://www.google.com"; // <-- PUT YOUR ADSTERRA LINK HERE
+        // --- CONFIGURATION ---
+        const ADMIN_PASS = "1234"; // <-- CHANGE YOUR PASSWORD HERE
+        const AD_LINK = "https://www.google.com"; // <-- PUT YOUR ADSTERRA LINK HERE
 
-        function openGate(t, l) {
-            finalLink = l;
-            document.getElementById('mTitle').innerText = t;
+        // --- MOVIE DATA ---
+        // Just keep adding movies here. 
+        let movies = [
+            {t: "Deadpool & Wolverine", i: "https://image.tmdb.org/t/p/w500/8cdWjvZQUmOZpPzs9vH7C2SClgn.jpg", l: "https://t.me/yourlink"},
+            {t: "Inside Out 2", i: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvhtv2oP0.jpg", l: "https://t.me/yourlink"}
+        ];
+
+        let curL = "";
+
+        function renderSite() {
+            document.getElementById('movieGrid').innerHTML = movies.map((m, idx) => `
+                <div class="card" onclick="openM(${idx})">
+                    <img src="${m.i}">
+                    <div class="card-info"><b>${m.t}</b></div>
+                </div>`).join('');
+            
+            // Generate the code for GitHub
+            document.getElementById('finalCode').value = `let movies = ${JSON.stringify(movies, null, 4)};`;
+        }
+
+        function openM(idx) {
+            curL = movies[idx].l;
+            document.getElementById('mTitle').innerText = movies[idx].t;
             document.getElementById('modal').style.display = 'flex';
             document.getElementById('s2').classList.add('off');
             document.getElementById('s3').classList.add('off');
         }
 
-        function goAd(s) {
-            window.open(MY_AD_LINK, '_blank');
+        function step(s) {
+            window.open(AD_LINK, '_blank');
             if(s==1) document.getElementById('s2').classList.remove('off');
-            else if(s==2) document.getElementById('s3').classList.remove('off');
-            else if(s==3) window.location.href = finalLink;
+            if(s==2) document.getElementById('s3').classList.remove('off');
+            if(s==3) window.location.href = curL;
         }
 
-        function closeGate() { document.getElementById('modal').style.display = 'none'; }
+        // --- ADMIN LOGIC ---
+        let timer;
+        const lgo = document.getElementById('logo');
+        lgo.onmousedown = lgo.ontouchstart = () => { timer = setTimeout(checkPass, 2000); };
+        lgo.onmouseup = lgo.ontouchend = () => { clearTimeout(timer); };
 
-        // --- FIXED ADMIN TRIGGER FOR MOBILE ---
-        let pressTimer;
-        const logo = document.getElementById('mainLogo');
-
-        logo.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { document.getElementById('admin').style.display='block'; }, 2000); });
-        logo.addEventListener('touchend', () => { clearTimeout(pressTimer); });
-        logo.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { document.getElementById('admin').style.display='block'; }, 2000); });
-        logo.addEventListener('mouseup', () => { clearTimeout(pressTimer); });
-
-        function gen() {
-            const t = document.getElementById('inT').value;
-            const i = document.getElementById('inI').value;
-            const l = document.getElementById('inL').value;
-            const code = `<div class="movie-card" onclick="openGate('${t.replace(/'/g, "\\'")}','${l}')">\n  <img src="${i}">\n  <div class="info"><h3>${t}</h3></div>\n</div>`;
-            document.getElementById('res').value = code;
+        function checkPass() {
+            let p = prompt("Enter Password:");
+            if(p === ADMIN_PASS) {
+                document.getElementById('admin').style.display='block';
+                renderAdmin();
+            } else { alert("Wrong!"); }
         }
+
+        function addNew() {
+            let t = document.getElementById('inT').value;
+            let i = document.getElementById('inI').value;
+            let l = document.getElementById('inL').value;
+            if(t && i && l) {
+                movies.unshift({t, i, l});
+                renderSite(); renderAdmin();
+                document.getElementById('inT').value = ""; document.getElementById('inI').value = ""; document.getElementById('inL').value = "";
+            }
+        }
+
+        function del(idx) {
+            movies.splice(idx, 1);
+            renderSite(); renderAdmin();
+        }
+
+        function renderAdmin() {
+            document.getElementById('adminList').innerHTML = movies.map((m, idx) => `
+                <div class="admin-item">
+                    <span>${m.t}</span>
+                    <button onclick="del(${idx})" style="background:red; color:white; border:none; border-radius:3px;">Delete</button>
+                </div>`).join('');
+            document.getElementById('finalCode').value = `let movies = ${JSON.stringify(movies, null, 4)};`;
+        }
+
+        renderSite();
     </script>
 </body>
 </html>
