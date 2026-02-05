@@ -3,110 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineRU | One-Click Telegram</title>
+    <title>CineRU | Premium Streaming</title>
     <style>
-        :root { --red: #e50914; --dark: #080808; --card-bg: #121212; }
-        body { background: var(--dark); color: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 10px; text-align: center; }
+        :root { --accent: #e50914; --main-bg: #050505; --card-bg: #111; }
+        body { background: var(--main-bg); color: white; font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        /* Layout */
-        .header { display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .logo { font-size: 2.2rem; font-weight: 900; color: var(--red); letter-spacing: 1px; cursor: pointer; }
-        
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; max-width: 1100px; margin: auto; }
-        
-        .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; position: relative; }
-        .movie-card:hover { transform: scale(1.05); border-color: var(--red); }
-        .movie-card img { width: 100%; height: 210px; object-fit: cover; }
-        .movie-card h3 { font-size: 0.85rem; padding: 10px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Premium Header */
+        .nav { background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); padding: 20px; display: flex; justify-content: center; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 2.4rem; font-weight: 900; color: var(--accent); letter-spacing: -1px; cursor: pointer; text-shadow: 0 0 15px rgba(229, 9, 20, 0.4); }
 
-        /* Unlocker Modal */
-        #unlockView { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-box { background: #181818; padding: 30px; border-radius: 20px; width: 85%; max-width: 380px; border: 1px solid #333; box-shadow: 0 0 20px rgba(229, 9, 20, 0.3); }
-        .step-btn { display: block; width: 100%; padding: 16px; margin: 12px 0; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; color: white; cursor: pointer; transition: 0.2s; }
-        .btn-1 { background: #ff4d4d; } .btn-2 { background: #ffa500; } .btn-3 { background: #28a745; }
-        .disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+        /* Netflix-Style Grid */
+        .container { padding: 0 15px 50px; }
+        .grid-title { text-align: left; font-size: 1.2rem; margin: 20px 0 15px; font-weight: 600; color: #eee; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+        
+        @media (min-width: 600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
 
-        /* Secret Generator Tool */
-        #adminPanel { display: none; background: #111; padding: 20px; border: 1px dashed var(--red); margin: 20px auto; max-width: 400px; border-radius: 10px; }
-        input { width: 90%; padding: 10px; margin: 5px; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
-        textarea { width: 90%; height: 80px; background: #000; color: #0f0; margin-top: 10px; font-family: monospace; }
+        .movie-card { background: var(--card-bg); border-radius: 6px; overflow: hidden; position: relative; transition: transform 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .movie-card:active { transform: scale(0.95); }
+        .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+        .movie-card .info { padding: 8px; background: #181818; }
+        .movie-card h3 { font-size: 0.75rem; margin: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Clean Unlock Modal */
+        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #181818; width: 90%; max-width: 360px; padding: 30px; border-radius: 12px; border: 1px solid #333; text-align: center; }
+        .step-btn { width: 100%; padding: 16px; margin: 10px 0; border: none; border-radius: 6px; font-weight: 700; color: white; cursor: pointer; font-size: 1rem; }
+        .b-red { background: var(--accent); } .b-gold { background: #b8860b; } .b-green { background: #2b8a3e; }
+        .off { opacity: 0.2; pointer-events: none; }
+
+        /* Secret Admin Panel */
+        #admin { display:none; position:fixed; bottom: 0; left: 0; right: 0; background: #111; padding: 20px; border-top: 2px solid var(--accent); z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
+        input { width: 95%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: white; border-radius: 4px; }
+        textarea { width: 95%; height: 60px; background: #000; color: #0f0; margin-top: 10px; font-size: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="logo" ondblclick="toggleAdmin()">🎬 CineRU</div>
+    <div class="nav">
+        <div class="logo" id="mainLogo">CineRU</div>
     </div>
 
-    <div id="movieContainer" class="movie-grid">
-        <div class="movie-card" onclick="openUnlocker('Deadpool & Wolverine', 'https://t.me/your_link_here')">
-            <img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUmOZpPzs9vH7C2SClgn.jpg">
-            <h3>Deadpool & Wolverine</h3>
-        </div>
+    <div class="container">
+        <h2 class="grid-title">New Releases</h2>
+        <div id="movieGrid" class="grid">
+            <div class="movie-card" onclick="openGate('Deadpool & Wolverine', 'https://t.me/yourlink')">
+                <img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUmOZpPzs9vH7C2SClgn.jpg">
+                <div class="info"><h3>Deadpool & Wolverine</h3></div>
+            </div>
 
-        </div>
+            </div>
+    </div>
 
-    <div id="unlockView">
-        <div class="modal-box">
-            <h2 id="targetTitle" style="color:var(--red); margin:0 0 10px 0;"></h2>
-            <p style="font-size: 0.9rem; color: #bbb;">Complete steps to unlock Telegram file</p>
-            
-            <button class="btn-1 step-btn" onclick="triggerAd(1)">STEP 1: Unlock</button>
-            <button id="s2" class="btn-2 step-btn disabled" onclick="triggerAd(2)">STEP 2: Verify</button>
-            <button id="s3" class="btn-3 step-btn disabled" onclick="triggerAd(3)">🚀 GET TELEGRAM FILE</button>
-            
-            <p onclick="closeUnlocker()" style="margin-top:20px; color: #666; cursor: pointer; text-decoration: underline;">Cancel</p>
+    <div id="modal">
+        <div class="modal-content">
+            <h2 id="mTitle" style="margin:0 0 10px; font-size:1.4rem;"></h2>
+            <p style="color:#aaa; font-size:0.9rem; margin-bottom:20px;">Complete 2 ads to get the Telegram file.</p>
+            <button class="step-btn b-red" onclick="goAd(1)">STEP 1: Unlock Link</button>
+            <button id="s2" class="step-btn b-gold off" onclick="goAd(2)">STEP 2: Final Verification</button>
+            <button id="s3" class="step-btn b-green off" onclick="goAd(3)">🚀 OPEN TELEGRAM FILE</button>
+            <p onclick="closeGate()" style="margin-top:20px; color:#555; cursor:pointer;">Cancel</p>
         </div>
     </div>
 
-    <div id="adminPanel">
-        <h3>Add Movie Generator</h3>
+    <div id="admin">
+        <h4 style="margin:0 0 10px;">Movie Code Generator</h4>
         <input id="inT" placeholder="Movie Name">
-        <input id="inI" placeholder="Poster Image URL">
+        <input id="inI" placeholder="Poster Link (URL)">
         <input id="inL" placeholder="Telegram Link">
-        <button onclick="createMovieCode()" style="padding:10px; width:95%; background:blue; color:white; border:none; margin-top:10px;">Generate Code</button>
-        <textarea id="outCode" readonly placeholder="Your code will appear here..."></textarea>
+        <button onclick="gen()" style="width:100%; padding:10px; background:blue; color:white; border:none; border-radius:4px;">Generate</button>
+        <textarea id="res" readonly placeholder="Copy code from here..."></textarea>
+        <button onclick="document.getElementById('admin').style.display='none'" style="margin-top:10px; background:transparent; color:red; border:none; width:100%;">Close Admin</button>
     </div>
 
     <script>
-        let telegramURL = "";
-        const ADSTERRA_LINK = "https://www.google.com"; // <-- REPLACE WITH YOUR ADSTERRA DIRECT LINK
+        let finalLink = "";
+        const MY_AD_LINK = "https://www.google.com"; // <-- PUT YOUR ADSTERRA LINK HERE
 
-        function openUnlocker(title, link) {
-            telegramURL = link;
-            document.getElementById('targetTitle').innerText = title;
-            document.getElementById('unlockView').style.display = 'flex';
-            // Reset buttons
-            document.getElementById('s2').classList.add('disabled');
-            document.getElementById('s3').classList.add('disabled');
+        function openGate(t, l) {
+            finalLink = l;
+            document.getElementById('mTitle').innerText = t;
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('s2').classList.add('off');
+            document.getElementById('s3').classList.add('off');
         }
 
-        function triggerAd(step) {
-            window.open(ADSTERRA_LINK, '_blank');
-            
-            if(step === 1) {
-                document.getElementById('s2').classList.remove('disabled');
-            } else if(step === 2) {
-                document.getElementById('s3').classList.remove('disabled');
-            } else if(step === 3) {
-                window.location.href = telegramURL;
-            }
+        function goAd(s) {
+            window.open(MY_AD_LINK, '_blank');
+            if(s==1) document.getElementById('s2').classList.remove('off');
+            else if(s==2) document.getElementById('s3').classList.remove('off');
+            else if(s==3) window.location.href = finalLink;
         }
 
-        function closeUnlocker() { document.getElementById('unlockView').style.display = 'none'; }
-        
-        // Admin Helper Functions
-        function toggleAdmin() {
-            const panel = document.getElementById('adminPanel');
-            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-        }
+        function closeGate() { document.getElementById('modal').style.display = 'none'; }
 
-        function createMovieCode() {
+        // --- FIXED ADMIN TRIGGER FOR MOBILE ---
+        let pressTimer;
+        const logo = document.getElementById('mainLogo');
+
+        logo.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { document.getElementById('admin').style.display='block'; }, 2000); });
+        logo.addEventListener('touchend', () => { clearTimeout(pressTimer); });
+        logo.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { document.getElementById('admin').style.display='block'; }, 2000); });
+        logo.addEventListener('mouseup', () => { clearTimeout(pressTimer); });
+
+        function gen() {
             const t = document.getElementById('inT').value;
             const i = document.getElementById('inI').value;
             const l = document.getElementById('inL').value;
-            const code = `<div class="movie-card" onclick="openUnlocker('${t.replace(/'/g, "\\'")}','${l}')">\n    <img src="${i}">\n    <h3>${t}</h3>\n</div>`;
-            document.getElementById('outCode').value = code;
+            const code = `<div class="movie-card" onclick="openGate('${t.replace(/'/g, "\\'")}','${l}')">\n  <img src="${i}">\n  <div class="info"><h3>${t}</h3></div>\n</div>`;
+            document.getElementById('res').value = code;
         }
     </script>
 </body>
