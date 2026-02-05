@@ -1,108 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineRU | Watch Free</title>
-    
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-
+    <title>CineRU</title>
     <style>
-        :root { --primary: #e50914; --bg: #0b0b0b; --card-bg: #141414; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; text-align: center; }
-        .header { font-size: 2.2rem; font-weight: bold; color: var(--primary); margin: 20px 0; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-        .card { background: var(--card-bg); border-radius: 10px; border: 1px solid #333; cursor: pointer; transition: 0.3s; overflow: hidden; }
-        .card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        body { background: #0b0b0b; color: white; font-family: sans-serif; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px; }
+        .card { background: #141414; border-radius: 10px; border: 1px solid #333; overflow: hidden; cursor: pointer; }
         .card img { width: 100%; height: 220px; object-fit: cover; }
-        .card h3 { padding: 10px; font-size: 0.85rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Unlock Modal */
-        #unlockView { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-box { background: #181818; padding: 25px; border-radius: 15px; width: 90%; max-width: 380px; border: 1px solid #333; }
-        .step-btn { display: block; width: 100%; padding: 15px; margin: 12px 0; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 1rem; }
-        .btn-red { background: #d9534f; } .btn-orange { background: #f0ad4e; } .btn-green { background: #5cb85c; }
-        .disabled { opacity: 0.3; cursor: not-allowed; }
+        /* Modal styles same as before */
+        #unlockView { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; }
+        .modal { background:#181818; padding:20px; border-radius:15px; width:80%; }
+        .btn { display:block; width:100%; padding:15px; margin:10px 0; border:none; border-radius:5px; color:white; font-weight:bold; }
     </style>
 </head>
 <body>
-
-    <div class="header">🎬 CineRU</div>
-    <div id="movieGrid" class="grid">Loading Library...</div>
+    <h1>🎬 CineRU</h1>
+    
+    <div class="grid">
+        </div>
 
     <div id="unlockView">
-        <div class="modal-box">
-            <h2 id="vTitle" style="color:var(--primary); margin-top:0;"></h2>
-            <button id="b1" class="step-btn btn-red" onclick="runStep(1)">1. Click Button 1</button>
-            <button id="b2" class="step-btn btn-orange disabled" onclick="runStep(2)" disabled>2. Click Button 2</button>
-            <button id="b3" class="step-btn btn-green disabled" onclick="runStep(3)" disabled>🚀 Get Telegram File</button>
-            <p onclick="closeM()" style="color:gray; cursor:pointer; margin-top:15px;">← Go Back</p>
+        <div class="modal">
+            <h2 id="vTitle"></h2>
+            <button class="btn" style="background:red" onclick="run(1)">Step 1</button>
+            <button id="b2" class="btn" style="background:orange;opacity:0.5" disabled onclick="run(2)">Step 2</button>
+            <button id="b3" class="btn" style="background:green;opacity:0.5" disabled onclick="run(3)">Get Movie</button>
         </div>
     </div>
 
     <script>
-        const DATA_API = 'http://cineru.wuaze.com/data.php';
-        let currentLink = "";
-
-        async function loadMovies() {
-            try {
-                // Using a Proxy to bypass InfinityFree/GitHub security blocks
-                const proxy = 'https://api.allorigins.win/get?url=';
-                const response = await fetch(proxy + encodeURIComponent(DATA_API));
-                const data = await response.json();
-                const movies = JSON.parse(data.contents);
-                
-                const grid = document.getElementById('movieGrid');
-                
-                if(!movies || movies.length === 0) {
-                    grid.innerHTML = "<p>No movies added yet. Check your Admin Panel!</p>";
-                    return;
-                }
-
-                grid.innerHTML = movies.map(m => `
-                    <div class="card" onclick="openM('${m.title.replace(/'/g, "\\'")}','${m.link}')">
-                        <img src="${m.thumb}">
-                        <h3>${m.title}</h3>
-                    </div>`).join('');
-            } catch (error) {
-                document.getElementById('movieGrid').innerHTML = "Click refresh. If still black, visit <a href='http://cineru.wuaze.com/data.php' style='color:red;'>this link</a> once to verify.";
-                console.error("Connection Error:", error);
-            }
+        let currentL = "";
+        function openM(t, l) { currentL = l; document.getElementById('vTitle').innerText = t; document.getElementById('unlockView').style.display='flex'; }
+        function run(s) {
+            window.open('https://google.com'); // Ad link
+            if(s==1) { document.getElementById('b2').disabled=false; document.getElementById('b2').style.opacity=1; }
+            if(s==2) { document.getElementById('b3').disabled=false; document.getElementById('b3').style.opacity=1; }
+            if(s==3) { window.location.href = currentL; }
         }
-
-        function openM(title, link) {
-            currentLink = link;
-            document.getElementById('vTitle').innerText = title;
-            document.getElementById('unlockView').style.display = 'flex';
-            resetButtons();
-        }
-
-        function runStep(step) {
-            window.open('https://google.com', '_blank'); // Add your Adsterra Direct Link here
-            if(step === 1) {
-                document.getElementById('b1').classList.add('disabled');
-                document.getElementById('b1').disabled = true;
-                document.getElementById('b2').disabled = false;
-                document.getElementById('b2').classList.remove('disabled');
-            } else if(step === 2) {
-                document.getElementById('b2').classList.add('disabled');
-                document.getElementById('b2').disabled = true;
-                document.getElementById('b3').disabled = false;
-                document.getElementById('b3').classList.remove('disabled');
-            } else {
-                window.location.href = currentLink;
-            }
-        }
-
-        function resetButtons() {
-            document.getElementById('b1').disabled = false; document.getElementById('b1').classList.remove('disabled');
-            document.getElementById('b2').disabled = true; document.getElementById('b2').classList.add('disabled');
-            document.getElementById('b3').disabled = true; document.getElementById('b3').classList.add('disabled');
-        }
-
-        function closeM() { document.getElementById('unlockView').style.display = 'none'; }
-
-        loadMovies();
     </script>
 </body>
 </html>
