@@ -3,39 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CineRU</title>
+    <title>🎬 CineRU</title>
     <style>
-        :root { --n-red: #E50914; --n-black: #000000; }
-        body { background: var(--n-black); color: white; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+        :root { --red: #E50914; --bg: #050505; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; user-select: none; }
         
-        /* Header */
-        .nav { height: 60px; display: flex; align-items: center; padding: 0 5%; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); position: fixed; top: 0; width: 100%; z-index: 100; }
-        .logo { color: var(--n-red); font-size: 1.6rem; font-weight: 800; letter-spacing: -1px; }
+        /* Premium Header */
+        .header { padding: 25px 0; text-align: center; background: linear-gradient(to bottom, #000, transparent); sticky; top: 0; z-index: 100; }
+        .logo { font-size: 2.2rem; font-weight: 900; color: var(--red); cursor: pointer; text-shadow: 0 0 15px rgba(229, 9, 20, 0.4); }
 
-        /* Main Grid */
-        .container { padding: 80px 4% 100px; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        @media (min-width: 768px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+        /* Movie Grid - The layout you liked */
+        .container { padding: 10px 15px 100px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+        .card { background: #111; border-radius: 8px; overflow: hidden; border: 1px solid #222; transition: 0.3s; }
+        .card:active { transform: scale(0.95); }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+        .card-info { padding: 8px; font-size: 0.75rem; text-align: center; background: #181818; }
 
-        .movie-card { position: relative; aspect-ratio: 2/3; border-radius: 4px; overflow: hidden; background: #141414; border: 1px solid #222; }
-        .movie-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        
-        /* Premium Ad Modal */
-        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #181818; width: 85%; max-width: 320px; padding: 25px; border-radius: 10px; text-align: center; border: 1px solid #333; }
-        .m-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; color: #fff; }
-        .btn { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 4px; font-weight: bold; font-size: 1rem; color: white; cursor: pointer; }
-        .b-red { background: var(--n-red); } .b-grey { background: #333; color: #888; pointer-events: none; } .b-green { background: #28a745; }
+        /* Adsterra Unlocker Modal */
+        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .modal-box { background: #181818; width: 85%; max-width: 340px; padding: 25px; border-radius: 15px; border: 1px solid #333; text-align: center; }
+        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: 700; color: white; font-size: 1rem; cursor: pointer; }
+        .off { opacity: 0.2; pointer-events: none; }
 
-        /* Admin Layout */
+        /* Admin Panel */
         #admin { display:none; position:fixed; inset:0; background: #000; z-index: 2000; padding: 20px; overflow-y: auto; }
-        .adm-input { width: 92%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
-        textarea { width: 92%; height: 120px; background: #111; color: #0f0; border: 1px solid #333; font-family: monospace; font-size: 10px; margin-top: 10px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
+        textarea { width: 90%; height: 120px; background: #000; color: #0f0; border: 1px solid #333; font-family: monospace; font-size: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="nav"><div class="logo">CineRU</div></div>
+    <div class="header">
+        <div class="logo" id="logo">🎬 CineRU</div>
+    </div>
 
     <div class="container">
         <div id="movieGrid" class="grid">
@@ -44,83 +45,76 @@
 
     <div id="modal">
         <div class="modal-box">
-            <div id="mName" class="m-title"></div>
-            <button class="btn b-red" onclick="ad(1)">1. Unlock File</button>
-            <button id="s2" class="btn b-grey" onclick="ad(2)">2. Final Verification</button>
-            <button id="s3" class="btn b-grey" onclick="ad(3)">🚀 Get Telegram Link</button>
-            <p onclick="closeGate()" style="color:#555; cursor:pointer; margin-top:15px; font-size:0.9rem;">Cancel</p>
+            <h2 id="mTitle" style="color:var(--red); margin:0 0 15px 0;"></h2>
+            <button class="btn" style="background:var(--red)" onclick="step(1)">1. Unlock File</button>
+            <button id="s2" class="btn off" style="background:#b8860b" onclick="step(2)">2. Final Verification</button>
+            <button id="s3" class="btn off" style="background:#28a745" onclick="step(3)">🚀 Open Telegram</button>
+            <p onclick="document.getElementById('modal').style.display='none'" style="margin-top:20px; color:#555; cursor:pointer;">Cancel</p>
         </div>
     </div>
 
-    <div style="padding: 40px; text-align:center; opacity:0.1; font-size:0.7rem;" onclick="openAdmin()">Admin Access</div>
-
     <div id="admin">
-        <h2 style="color:var(--n-red)">CineRU Manager</h2>
-        <input id="inT" class="adm-input" placeholder="Movie Name">
-        <input id="inI" class="adm-input" placeholder="Poster URL (TMDB)">
-        <input id="inL" class="adm-input" placeholder="Telegram Link">
-        <button onclick="addM()" class="btn b-red">Add to Grid</button>
+        <h2 style="color:var(--red)">🎬 CineRU Manager</h2>
+        <input id="inT" placeholder="Movie Name">
+        <input id="inI" placeholder="Poster URL">
+        <input id="inL" placeholder="Telegram Link">
+        <button onclick="addM()" class="btn" style="background:blue">Add Movie</button>
         <div id="admList" style="margin-top:20px;"></div>
-        <p style="color:yellow; font-size:0.8rem; margin-top:20px;">Copy this code to GitHub index.html:</p>
+        <p style="color:yellow; font-size:0.8rem; margin-top:20px;">Copy this code and paste into GitHub index.html:</p>
         <textarea id="output" readonly onclick="this.select()"></textarea>
-        <button onclick="location.reload()" class="btn" style="background:#222; margin-top:20px;">Exit Admin</button>
+        <button onclick="location.reload()" class="btn" style="background:#222">Exit & Close</button>
     </div>
 
     <script>
-        // --- DATA ---
-        const AD_URL = "https://www.google.com"; // <-- PUT ADSTERRA LINK HERE
+        // --- DATA SECTION ---
+        const AD_URL = "https://www.google.com"; // <-- PUT YOUR ADSTERRA LINK HERE
         const PASS = "2024";
 
-        // To update movies, paste the generated code from Admin between the [ ]
+        // To add movies, paste the code from Admin here:
         let movies = [
             {t: "Deadpool & Wolverine", i: "https://image.tmdb.org/t/p/w500/8cdWjvZQUmOZpPzs9vH7C2SClgn.jpg", l: "https://t.me/yourlink"},
             {t: "Inside Out 2", i: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvhtv2oP0.jpg", l: "https://t.me/yourlink"}
         ];
 
-        let targetL = "";
+        let curL = "";
 
         function render() {
             document.getElementById('movieGrid').innerHTML = movies.map((m, i) => `
-                <div class="movie-card" onclick="openGate(${i})">
+                <div class="card" onclick="openGate(${i})">
                     <img src="${m.i}">
+                    <div class="card-info"><b>${m.t}</b></div>
                 </div>`).join('');
             document.getElementById('output').value = `let movies = ${JSON.stringify(movies, null, 4)};`;
         }
 
         function openGate(i) {
-            targetL = movies[i].l;
-            document.getElementById('mName').innerText = movies[i].t;
+            curL = movies[i].l;
+            document.getElementById('mTitle').innerText = movies[i].t;
             document.getElementById('modal').style.display = 'flex';
-            resetBtns();
+            document.getElementById('s2').classList.add('off');
+            document.getElementById('s3').classList.add('off');
         }
 
-        function ad(s) {
+        function step(s) {
             window.open(AD_URL, '_blank');
-            if(s==1) { btnOn('s2', 'b-red'); }
-            if(s==2) { btnOn('s3', 'b-green'); }
-            if(s==3) { window.location.href = targetL; }
+            if(s==1) document.getElementById('s2').classList.remove('off');
+            if(s==2) document.getElementById('s3').classList.remove('off');
+            if(s==3) window.location.href = curL;
         }
 
-        function btnOn(id, cls) { 
-            let b = document.getElementById(id); 
-            b.className = `btn ${cls}`; b.style.pointerEvents = 'auto'; 
-        }
+        // --- ADMIN TRIGGER (HOLD LOGO) ---
+        let timer;
+        const logoBtn = document.getElementById('logo');
 
-        function resetBtns() {
-            document.getElementById('s2').className = 'btn b-grey'; document.getElementById('s2').style.pointerEvents = 'none';
-            document.getElementById('s3').className = 'btn b-grey'; document.getElementById('s3').style.pointerEvents = 'none';
-        }
+        function startTimer() { timer = setTimeout(() => { if(prompt("Pass:") === PASS) document.getElementById('admin').style.display='block'; }, 1500); }
+        function endTimer() { clearTimeout(timer); }
 
-        function closeGate() { document.getElementById('modal').style.display = 'none'; }
+        logoBtn.addEventListener('touchstart', startTimer);
+        logoBtn.addEventListener('touchend', endTimer);
+        logoBtn.addEventListener('mousedown', startTimer);
+        logoBtn.addEventListener('mouseup', endTimer);
 
-        // --- ADMIN ---
-        function openAdmin() {
-            if(prompt("Pass:") === PASS) {
-                document.getElementById('admin').style.display='block';
-                drawAdm();
-            }
-        }
-
+        // --- ADMIN FUNCTIONS ---
         function addM() {
             let t = document.getElementById('inT').value, i = document.getElementById('inI').value, l = document.getElementById('inL').value;
             if(t && i && l) {
