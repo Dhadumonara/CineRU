@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎬 CineRU</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">
+    <div class="logo" id="logo">🎬 CineRU</div>
+    <div class="search-container">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchBar" onkeyup="filterMovies()" placeholder="Search movies...">
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="movieGrid" class="grid"></div>
+</div>
+
+<div id="modal">
+    <div class="modal-box">
+        <h2 id="mTitle" style="color:var(--red); margin:0 0 15px;"></h2>
+        <button class="btn" style="background:var(--red)" onclick="step(1)">1. Unlock Link</button>
+        <button id="s2" class="btn off" style="background:#b8860b" onclick="step(2)">2. Verify Link</button>
+        <button id="s3" class="btn off" style="background:#28a745" onclick="step(3)">🚀 Open Telegram</button>
+        <p onclick="modal.style.display='none'" style="margin-top:15px;color:#555;cursor:pointer;">Cancel</p>
+    </div>
+</div>
+
+<div id="passModal">
+    <div class="modal-box">
+        <div style="font-size:1.5rem;margin-bottom:20px;font-weight:bold;">🔒 Admin Login</div>
+        <input type="password" id="pInput" class="adm-input" placeholder="Password">
+        <button onclick="verifyPass()" class="btn" style="background:var(--red)">Login</button>
+        <p onclick="passModal.style.display='none'" style="color:#555;cursor:pointer;margin-top:10px;">Cancel</p>
+    </div>
+</div>
+
+<div id="admin">
+    <div class="admin-box">
+        <h2 style="color:var(--red); margin:0 0 15px;">Admin Panel</h2>
+
+        <input id="inT" class="adm-input" placeholder="Movie Name">
+        <input id="inI" class="adm-input" placeholder="Poster URL" oninput="previewPoster(this.value)">
+        <img id="posterPreview" style="width:100%;border-radius:8px;display:none;margin-bottom:10px;">
+        <input id="inL" class="adm-input" placeholder="Telegram Link">
+
+        <select id="inC" class="adm-input">
+            <option value="">Select Category</option>
+            <option>Action</option>
+            <option>Horror</option>
+            <option>Anime</option>
+            <option>18+</option>
+            <option>Web Series</option>
+            <option>South</option>
+            <option>Korean</option>
+        </select>
+
+        <button onclick="addM()" class="btn" style="background:var(--red)">Save Movie</button>
+
+        <input id="admSearch" class="adm-input" placeholder="Search movie..." onkeyup="drawAdm()">
+
+        <div id="admList" style="margin-top:15px;max-height:160px;overflow-y:auto;border-top:1px solid #222;"></div>
+
+        <p style="color:yellow;font-size:0.7rem;margin-top:15px;">Backup:</p>
+        <textarea id="output" readonly onclick="this.select()"></textarea>
+
+        <button onclick="location.reload()" class="btn" style="background:#333">Exit Admin</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
